@@ -15,6 +15,7 @@ Execute:
 -------------
 
 The following command will write out user agent strings to uas.txt in csv format:
+
     scrapy crawl -t csv -o uas.txt whatismybrowser
 
 You can use `-a` to pass "max_page" argument to control how many pages to crawl, by default max_page is 10.
