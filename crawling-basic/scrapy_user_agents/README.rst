@@ -1,14 +1,14 @@
-scrapy_user_agents
+scrapy-user-agents
 =====================
 
-Random User-Agent middleware picks up ``User-Agent`` strings based on `Python User Agents <https://github.com/selwin/python-user-agents>`__ and `MDN <https://developer.mozilla.org/en-US/docs/Web/HTTP/Browser_detection_using_the_user_agent>`.
+Random User-Agent middleware picks up ``User-Agent`` strings based on `Python User Agents <https://github.com/selwin/python-user-agents>`__ and `MDN <https://developer.mozilla.org/en-US/docs/Web/HTTP/Browser_detection_using_the_user_agent>`__.
 
 Installation
 -------------
 
 The simplest way is to install it via `pip`:
 
-    pip install scrapy_user_agents
+    pip install scrapy-user-agents
 
 Configuration
 -------------

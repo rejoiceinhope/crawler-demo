@@ -19,10 +19,12 @@ class RandomUserAgentMiddleware(object):
         per_proxy = crawler.settings.getbool('RANDOM_UA_PER_PROXY', False)
         ua_type = crawler.settings.get('RANDOM_UA_TYPE', 'desktop.chrome')
         same_os_family = crawler.settings.getbool('RANDOM_UA_SAME_OS_FAMILY', True)
-        ua_file = crawler.settings.get('RANDOM_UA_FILE', './default_uas.txt')
-        ua_file = os.path.abspath(os.path.expanduser(ua_file))
-        if not os.path.isfile(ua_file):
-            raise RuntimeError('Given user agent file does not exist - %s' % ua_file)
+        ua_file = crawler.settings.get('RANDOM_UA_FILE')
+        if ua_file is None:
+            cur_dir, _ = os.path.split(__file__)
+            ua_file = os.path.join(cur_dir, 'default_uas.txt')
+        else:
+            ua_file = os.path.abspath(os.path.expanduser(ua_file))
 
         uas = []
         with open(ua_file) as ua_fh:

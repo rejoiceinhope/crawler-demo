@@ -8,7 +8,7 @@ from setuptools import setup
 
 setup(
     name='scrapy_user_agents',
-    version='0.1.0',
+    version='0.1.1',
     description='Automatically pick an User-Agent for every request',
     long_description=open('README.rst').read(),
     keywords='scrapy proxy user-agent web-scraping',
@@ -27,6 +27,8 @@ setup(
     packages=[
         'scrapy_user_agents',
     ],
+    package_dir={'scrapy_user_agents': 'scrapy_user_agents'},
+    package_data={'scrapy_user_agents': ['default_uas.txt']},
     install_requires=[
         'user-agents'
     ],
