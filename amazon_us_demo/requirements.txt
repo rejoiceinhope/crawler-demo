@@ -1,0 +1,3 @@
+Scrapy
+scrapy-user-agents
+git+https://github.com/hyan15/python-deathbycaptcha.git
