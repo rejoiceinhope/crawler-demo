@@ -6,6 +6,7 @@
 
 import re
 import json
+import pdb
 
 class ProductDetailParser(object):
     @classmethod
