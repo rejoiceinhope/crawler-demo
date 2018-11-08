@@ -216,3 +216,224 @@ class ProductDetailParser(object):
                 rank = 0
 
         return rank
+
+
+class OfferListingParser(object):
+
+    @classmethod
+    def parse(cls, response):
+        offers = []
+        asin = cls.parse_asin(response)
+        for offer_elem in response.xpath('.//div[@id="olpOfferList"]//div[contains(@class, "olpOffer")]'):
+            offer = dict()
+            offer['price'] = cls.parse_price(offer_elem)
+            offer['shipping_price'] = cls.parse_shipping_price(offer_elem)
+            offer['condition'], offer['subcondition'] = cls.parse_condition(offer_elem)
+            offer['condition_comments'] = cls.parse_condition_comments(offer_elem)
+            offer['available'] = cls.parse_availability(offer_elem)
+            offer['prime'] = cls.parse_prime(offer_elem)
+            offer['expected_shipping'] = cls.parse_expected_shipping(offer_elem)
+            offer['seller_name'] = cls.parse_seller_name(offer_elem)
+            offer['seller_rating'] = cls.parse_seller_rating(offer_elem)
+            offer['seller_feedbacks'] = cls.parse_seller_feedbacks(offer_elem)
+            offer['seller_stars'] = cls.parse_seller_stars(offer_elem)
+            offer['offer_listing_id'] = cls.parse_offer_listing_id(offer_elem)
+            offers.append(offer)
+
+        return {'asin': asin, 'offers': json.dumps(offers)}
+
+    @classmethod
+    def parse_asin(cls, response):
+        matched = re.match(r'.*www\.amazon\.com\/gp\/offer-listing\/([0-9A-Z]{10}).*', response.url)
+        return '' if matched is None or len(matched.groups()) <= 0 else matched.groups()[0]
+
+    @classmethod
+    def parse_price(cls, offer_elem):
+        price = 0
+
+        price_str = offer_elem.xpath(
+            './div[contains(@class, "olpPriceColumn")]/span[contains(@class, "olpOfferPrice")]/text()').extract_first()
+        if price_str:
+            price = float(re.sub(r'[^0-9\.]', '', price_str.strip().replace(',', '.')))
+        else:
+            raise RuntimeError('Could not find price element')
+
+        return price
+
+    @classmethod
+    def parse_shipping_price(cls, offer_elem):
+        shipping_price = 0
+
+        prime_elem = offer_elem.xpath(
+            './div[contains(@class, "olpPriceColumn")]/span[contains(@class, "supersaver")]').extract_first()
+        if prime_elem:
+            return 0
+
+        shipping_price_str = offer_elem.xpath(
+            './div[contains(@class, "olpPriceColumn")]/p[@class="olpShippingInfo"]//span[@class="olpShippingPrice"]/text()').extract_first()
+        if shipping_price_str:
+            return float(shipping_price_str.strip().replace('$', '').replace(',', ''))
+
+        free_shipping_str = offer_elem.xpath(
+            './div[contains(@class, "olpPriceColumn")]/p[@class="olpShippingInfo"]/span[@class="a-color-secondary"]/b/text()').extract_first()
+        if free_shipping_str:
+            if free_shipping_str.lower().find('free') != -1:
+                return 0
+
+        raise RuntimeError('Could not find shipping price element')
+
+    @classmethod
+    def parse_condition(cls, offer_elem):
+        condition = ''
+        sub_condition = ''
+
+        condition_elem = offer_elem.xpath(
+            './div[contains(@class, "olpConditionColumn")]//span[contains(@class, "olpCondition")]')
+        if not condition_elem:
+            raise RuntimeError('Could not find condition element')
+
+        id_str = condition_elem.xpath('./@id').extract_first()
+        if id_str:
+            if id_str.lower().find('new') != -1:
+                condition = 'New'
+                sub_condition = 'New'
+            elif id_str.lower().find('collectible') != -1:
+                condition = 'Collectible'
+                sub_condition = condition_elem.xpath(
+                    './span[@id="offerSubCondition"]/text()').extract_first().strip()
+            else:
+                condition = 'Used'
+                sub_condition = condition_elem.xpath(
+                    './span[@id="offerSubCondition"]/text()').extract_first().strip()
+        else:
+            condition_strs = condition_elem.xpath('.//text()').extract()
+            condition_str = [part.strip() for part in condition_strs]
+            if condition_str.lower().find('new') != -1:
+                condition = 'New'
+                sub_condition = 'New'
+            elif condition_str.lower().find('collectible') != -1:
+                condition = 'Collectible'
+                sub_condition = condition_elem.xpath(
+                    './span[@id="offerSubCondition"]/text()').extract_first().strip()
+            else:
+                conditions = [part.strip() for part in condition_str.split('-')]
+                if len(conditions) > 1:
+                    condition = conditions.pop(0)
+                    sub_condition = conditions.pop(0)
+                else:
+                    condition = conditions.pop(0)
+                    sub_condition = condition
+
+        return (condition, sub_condition)
+
+    @classmethod
+    def parse_condition_comments(cls, offer_elem):
+        comments = ''
+
+        comments_elem = offer_elem.xpath(
+            './div[contains(@class, "olpConditionColumn")]/div[contains(@class, "comments")]')
+        if comments_elem:
+            comments_wrappers = comments_elem.xpath('.//div')
+            if len(comments_wrappers) > 0:
+                comment_strs = comments_wrappers.xpath('./text()').extract()
+                comments = ''.join([comment_str.strip() for comment_str in comment_strs])
+            else:
+                comments = comments_elem.xpath('./text()').extract_first().strip()
+
+        return comments
+
+    @classmethod
+    def parse_availability(cls, offer_elem):
+        available = True
+
+        availability_elem = offer_elem.xpath(
+            './olpAvailability').extract_first()
+        if availability_elem:
+            availability_str = availability_elem.xpath('./text()').extract_first().strip()
+            if availability_str:
+                available = False
+
+        return available
+
+    @classmethod
+    def parse_prime(cls, offer_elem):
+        prime_elem = offer_elem.xpath(
+            './div[contains(@class, "olpPriceColumn")]/span[contains(@class, "supersaver")]').extract_first()
+        return prime_elem is not None
+
+    @classmethod
+    def parse_expected_shipping(cls, offer_elem):
+        shipping_content = ''.join(offer_elem.xpath(
+            './div[contains(@class, "olpDeliveryColumn")]/ul[contains(@class, "olpFastTrack")]/li//text()').extract())
+        expected_shipping = bool(
+            re.search(r'.*(One|Two)-Day Shipping.*', shipping_content, re.M))
+        expected_shipping = expected_shipping or bool(
+            re.search(r'.*Expedited Shipping.*', shipping_content, re.M))
+        return expected_shipping
+
+    @classmethod
+    def parse_seller_name(cls, offer_elem):
+        seller_name = ''
+
+        amazon_elem = offer_elem.xpath(
+            './div[contains(@class, "olpSellerColumn")]/*[contains(@class, "olpSellerName")]//img').extract_first()
+        if amazon_elem is not None:
+            return 'Amazon'
+
+        raw_seller_name = offer_elem.xpath(
+            './div[contains(@class, "olpSellerColumn")]/*[contains(@class, "olpSellerName")]//a/text()').extract_first()
+        if raw_seller_name:
+            seller_name = raw_seller_name.strip()
+        else:
+            raise RuntimeError('Could not find seller name')
+
+        return seller_name
+
+    @classmethod
+    def parse_seller_rating(cls, offer_elem):
+        rating = 0
+
+        rating_str = offer_elem.xpath(
+            './div[contains(@class, "olpSellerColumn")]/p/a/b/text()').extract_first()
+        if rating_str:
+            rating = int(rating_str.split().pop(0).replace('%', ''))
+        else:
+            rating = 0
+
+        return rating
+
+    @classmethod
+    def parse_seller_feedbacks(cls, offer_elem):
+        feedbacks = 0
+
+        seller_desc_elem = offer_elem.xpath(
+            './div[contains(@class, "olpSellerColumn")]/p')
+        if seller_desc_elem:
+            raw_seller_descs = seller_desc_elem.xpath('./text()').extract()
+            seller_desc = ''.join([raw_seller_desc.strip() for raw_seller_desc in raw_seller_descs])
+            if seller_desc:
+                matched_feedback = re.match(r'.*\(([0-9\.,]+) total ratings\)', seller_desc)
+                raw_feedbacks_str = matched_feedback.groups()[0] if matched_feedback and len(matched_feedback.groups()) > 0 else '0'
+                feedbacks = int(raw_feedbacks_str.replace(',', ''))
+            else:
+                feedbacks = 0
+
+        return feedbacks
+
+    @classmethod
+    def parse_seller_stars(cls, offer_elem):
+        star = 0
+
+        raw_star_str = offer_elem.xpath(
+            './div[contains(@class, "olpSellerColumn")]/p/i/span/text()').extract_first()
+        if raw_star_str:
+            star = float(raw_star_str.split().pop(0))
+        else:
+            star = 0
+
+        return star
+
+    @classmethod
+    def parse_offer_listing_id(cls, offer_elem):
+        return offer_elem.xpath(
+            './div[contains(@class, "olpBuyColumn")]//form/input[@name="offeringID.1"]/@value').extract_first()

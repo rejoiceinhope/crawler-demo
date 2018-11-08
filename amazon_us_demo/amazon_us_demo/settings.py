@@ -115,9 +115,9 @@ AMAZON_CAPTCHA_RESOLVER_THRESHOLD = os.getenv('AMAZON_CAPTCHA_RESOLVER_THRESHOLD
 
 
 # CSV Exporter settings
-FIELDS_TO_EXPORT = [
-  'asin', 'rank', 'star', 'reviews', 'categories', 'images', 'author',
-  'title', 'details', 'feature_bullets', 'book_description', 'product_description']
+# FIELDS_TO_EXPORT = [
+#   'asin', 'rank', 'star', 'reviews', 'categories', 'images', 'author',
+#   'title', 'details', 'feature_bullets', 'book_description', 'product_description']
 
 FEED_EXPORTERS = {
     'csv': 'amazon_us_demo.exporters.CustomCsvItemExporter'

@@ -37,7 +37,7 @@ class AmazonUsDemoPipeline(object):
             if key_lower.find('rank') != -1:
                 continue
 
-            pairs.append('{}:{}'.format(key.strip(), value.strip('(').strip()))
+            pairs.append('{}:{}'.format(key.strip(), value.strip('(').strip().encode('utf-8')))
         formatted_item['details'] = ';'.join(pairs)
         formatted_item['star'] = item['star']
         formatted_item['reviews'] = item['reviews']

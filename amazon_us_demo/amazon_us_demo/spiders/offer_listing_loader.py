@@ -6,25 +6,19 @@ import pdb
 
 import scrapy
 
-from amazon_us_demo.parsers import ProductDetailParser
+from amazon_us_demo.parsers import OfferListingParser
 
 
-class DetailLoaderSpider(scrapy.Spider):
-    name = 'detail_loader'
+class OfferListingLoaderSpider(scrapy.Spider):
+    name = 'offer_listing_loader'
     allowed_domains = ['www.amazon.com']
-    start_urls = ['https://www.amazon.com/']
-    custom_settings = {
-        'FIELDS_TO_EXPORT': [
-            'asin', 'rank', 'star', 'reviews', 'categories', 'images', 'author',
-           'title', 'details', 'feature_bullets', 'book_description', 'product_description'
-        ]
-    }
+    custom_settings = {'ITEM_PIPELINES': {}, 'FIELDS_TO_EXPORT': ['asin', 'offers']}
 
     def start_requests(self):
         asins_path = getattr(self, 'asins_path', None)
         if asins_path is None:
             self.logger.critical(
-                '[InvalidArguments] You must supply "asins_path" argument to run detail_loader spider.')
+                '[InvalidArguments] You must supply "asins_path" argument to run offer_listing_loader spider.')
             return
 
         asins_path = os.path.abspath(os.path.expanduser(asins_path))
@@ -38,15 +32,14 @@ class DetailLoaderSpider(scrapy.Spider):
                 for line in asin_fh:
                     asin = line.strip()
                     if self._is_valid_asin(asin):
-                        yield self._generate_asin_url(asin)
+                        yield self._generate_offer_listing_url(asin)
 
     def parse(self, response):
         try:
-            product = ProductDetailParser.parse(response)
-            yield product
+            offer_listings = OfferListingParser.parse(response)
+            yield offer_listings
         except Exception as e:
             self.logger.exception(e)
-            pdb.set_trace()
 
     def _find_asin_files(self, asins_path):
         asin_files = []
@@ -70,9 +63,8 @@ class DetailLoaderSpider(scrapy.Spider):
 
         return valid
 
-    def _generate_asin_url(self, asin):
-        url = 'https://www.amazon.com/dp/' + asin
-        referer = 'https://www.amazon.com/s/ref=nb_sb_noss_2?url=search-alias=aps&field-keywords='
-        referer = referer + asin
+    def _generate_offer_listing_url(self, asin):
+        url = 'https://www.amazon.com/gp/offer-listing/{}'.format(asin)
+        referer = 'https://www.amazon.com/s/ref=nb_sb_noss_2?url=search-alias=aps&field-keywords={}'.format(asin)
 
         return scrapy.Request(url, headers={'Referer': referer})
