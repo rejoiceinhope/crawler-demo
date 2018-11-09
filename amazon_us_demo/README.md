@@ -35,6 +35,20 @@ Please refer to amazon_us_demo/settings.py.
 Execution
 -------------
 
+Before run this demo, the following environment variables should be defined:
+* AMAZON_CAPTCHA_RESOLVER_USERNAME - Your deathbycaptcha username
+* AMAZON_CAPTCHA_RESOLVER_PASSWORD - Your deathbycaptcha password
+* AMAZON_CAPTCHA_RESOLVER_THRESHOLD - Captcha resolve rate threshold, default is 32/s.
+* ELASTICSEARCH_SERVERS - Elasticsearch server, default is '127.0.0.1'.
+* ELASTICSEARCH_INDEX - Elasticsearch index.
+* ELASTICSEARCH_USERNAME - Elasticsearch username.
+* ELASTICSEARCH_PASSWORD - Elasticsearch password.
+* ELASTICSEARCH_ID_KEY - Elasticsearch index id field name, default is 'asin'.
+* ELASTICSEARCH_TIMEOUT - Elasticsearch timeout, default is 60.
+* ELASTICSEARCH_MAX_RETRY - Elasticsearch index max retry times, default is 3.
+* ELASTICSEARCH_BUFFER_LENGTH - Item count per index operation, default is 500.
+
 You can run this demo by:
 
-    AMAZON_CAPTCHA_RESOLVER_USERNAME=<your-deathbycaptcha-username> AMAZON_CAPTCHA_RESOLVER_PASSWORD=<your-deathbycaptcha-password> scrapy crawl -a asins_path=./test_asins.txt -t csv -o <your-detail-path> detail_loader
+    scrapy crawl -a asins_path=./test_asins.txt detail_loader
+    scrapy crawl -a asins_path=./test_asins.txt offer_listing_loader
