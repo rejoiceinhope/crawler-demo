@@ -42,9 +42,9 @@ COOKIES_ENABLED = True
 
 # Override the default request headers:
 DEFAULT_REQUEST_HEADERS = {
-   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-   'Accept-Language': 'en-US',
-   'Referer': 'https://www.amazon.com'
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    'Accept-Language': 'en-US',
+    'Referer': 'https://www.amazon.com'
 }
 
 # Enable or disable spider middlewares
@@ -71,9 +71,8 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-ITEM_PIPELINES = {
-    'amazon_us_demo.pipelines.AmazonUsDemoPipeline': 300,
-}
+# ITEM_PIPELINES = {
+# }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
@@ -112,6 +111,16 @@ AMAZON_CAPTCHA_RESOLVER_ENABLED = True
 AMAZON_CAPTCHA_RESOLVER_USERNAME = os.getenv('AMAZON_CAPTCHA_RESOLVER_USERNAME', '')
 AMAZON_CAPTCHA_RESOLVER_PASSWORD = os.getenv('AMAZON_CAPTCHA_RESOLVER_PASSWORD', '')
 AMAZON_CAPTCHA_RESOLVER_THRESHOLD = os.getenv('AMAZON_CAPTCHA_RESOLVER_THRESHOLD', 32)
+
+# ElasticSearchPipline settings
+ELASTICSEARCH_SERVERS = os.getenv('ELASTICSEARCH_SERVERS', '127.0.0.1')
+ELASTICSEARCH_INDEX = os.getenv('ELASTICSEARCH_INDEX', 'amazon_us_demo')
+ELASTICSEARCH_USERNAME = os.getenv('ELASTICSEARCH_USERNAME', '')
+ELASTICSEARCH_PASSWORD = os.getenv('ELASTICSEARCH_PASSWORD', '')
+ELASTICSEARCH_ID_KEY = os.getenv('ELASTICSEARCH_ID_KEY', 'asin')
+ELASTICSEARCH_TIMEOUT = int(os.getenv('ELASTICSEARCH_TIMEOUT', 60))
+ELASTICSEARCH_MAX_RETRY = int(os.getenv('ELASTICSEARCH_MAX_RETRY', 3))
+ELASTICSEARCH_BUFFER_LENGTH = int(os.getenv('ELASTICSEARCH_BUFFER_LENGTH', 500))
 
 
 # CSV Exporter settings

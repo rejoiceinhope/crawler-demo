@@ -2,7 +2,6 @@
 
 import os
 import re
-import pdb
 
 import scrapy
 
@@ -12,7 +11,12 @@ from amazon_us_demo.parsers import OfferListingParser
 class OfferListingLoaderSpider(scrapy.Spider):
     name = 'offer_listing_loader'
     allowed_domains = ['www.amazon.com']
-    custom_settings = {'ITEM_PIPELINES': {}, 'FIELDS_TO_EXPORT': ['asin', 'offers']}
+    custom_settings = {
+        'ITEM_PIPELINES': {
+            'amazon_us_demo.pipelines.AmazonUsOfferListingPipeline': 300
+        },
+        'FIELDS_TO_EXPORT': ['asin', 'offers']
+    }
 
     def start_requests(self):
         asins_path = getattr(self, 'asins_path', None)

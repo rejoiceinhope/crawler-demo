@@ -16,8 +16,11 @@ class DetailLoaderSpider(scrapy.Spider):
     custom_settings = {
         'FIELDS_TO_EXPORT': [
             'asin', 'rank', 'star', 'reviews', 'categories', 'images', 'author',
-           'title', 'details', 'feature_bullets', 'book_description', 'product_description'
-        ]
+            'title', 'details', 'feature_bullets', 'book_description', 'product_description'
+        ],
+        'ITEM_PIPELINES': {
+            'amazon_us_demo.pipelines.AmazonUsDetailPipeline': 300
+        }
     }
 
     def start_requests(self):
