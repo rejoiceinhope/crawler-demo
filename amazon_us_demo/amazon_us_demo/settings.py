@@ -10,6 +10,13 @@
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 import os
+import sys
+import redis
+from dotenv import load_dotenv
+
+dotenv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+if os.path.isfile(dotenv_path):
+  load_dotenv(dotenv_path=dotenv_path)
 
 BOT_NAME = 'amazon_us_demo'
 
@@ -24,18 +31,20 @@ NEWSPIDER_MODULE = 'amazon_us_demo.spiders'
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 8
+# CONCURRENT_REQUESTS = sys.maxint if hasattr(sys, 'maxint') else sys.maxsize
+CONCURRENT_REQUESTS = 360
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 0
+DOWNLOAD_DELAY = 0.33
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
-CONCURRENT_REQUESTS_PER_IP = 8
+CONCURRENT_REQUESTS_PER_IP = 3
 
 # Disable cookies (enabled by default)
 COOKIES_ENABLED = True
+COOKIES_DEBUG = True
 
 # Disable Telnet Console (enabled by default)
 #TELNETCONSOLE_ENABLED = False
@@ -60,6 +69,8 @@ DOWNLOADER_MIDDLEWARES = {
     'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
     'scrapy.downloadermiddlewares.retry.RetryMiddleware': 410,
     'amazon_us_demo.middlewares.AmazonUsCaptchaResolverMiddleware': 450,
+    'scrapy_proxy_pool.middlewares.ProxyPoolMiddleware': 610,
+    'scrapy_proxy_pool.middlewares.BanDetectionMiddleware': 620,
     'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
 }
 
@@ -78,12 +89,12 @@ DOWNLOADER_MIDDLEWARES = {
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
 AUTOTHROTTLE_ENABLED = True
 # The initial download delay
-AUTOTHROTTLE_START_DELAY = 1
+AUTOTHROTTLE_START_DELAY = 0.33
 # The maximum download delay to be set in case of high latencies
 AUTOTHROTTLE_MAX_DELAY = 60
 # The average number of requests Scrapy should be sending in parallel to
 # each remote server
-AUTOTHROTTLE_TARGET_CONCURRENCY = 4.0
+AUTOTHROTTLE_TARGET_CONCURRENCY = 3.0
 # Enable showing throttling stats for every response received:
 AUTOTHROTTLE_DEBUG = False
 
@@ -98,7 +109,7 @@ AUTOTHROTTLE_DEBUG = False
 # RetryMiddleware settings
 RETRY_ENABLED = True
 RETRY_TIMES = 5
-RETRY_HTTP_CODES = [500, 502, 503, 504, 408, 400, 404]
+RETRY_HTTP_CODES = [500, 503, 408, 400]
 
 # User agent settings
 RANDOM_UA_TYPE = 'desktop.random'
@@ -122,6 +133,38 @@ ELASTICSEARCH_TIMEOUT = int(os.getenv('ELASTICSEARCH_TIMEOUT', 60))
 ELASTICSEARCH_MAX_RETRY = int(os.getenv('ELASTICSEARCH_MAX_RETRY', 3))
 ELASTICSEARCH_BUFFER_LENGTH = int(os.getenv('ELASTICSEARCH_BUFFER_LENGTH', 500))
 
+# scrapy-redis settings
+REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379')
+REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
+REDIS_CLS = redis.Redis
+REDIS_PARAMS  = {}
+
+REDIS_START_URLS_BATCH_SIZE = sys.maxint if hasattr(sys, 'maxint') else sys.maxsize
+REDIS_START_URLS_AS_SET = False
+REDIS_START_URLS_KEY = '%(name)s:start_urls'
+REDIS_ENCODING = 'utf-8'
+
+SCHEDULER = 'scrapy_redis.scheduler.Scheduler'
+# SCHEDULER_SERIALIZER = 'scrapy_redis.picklecompat'
+SCHEDULER_SERIALIZER = 'json'
+SCHEDULER_PERSIST = True
+SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.FifoQueue'
+SCHEDULER_IDLE_BEFORE_CLOSE = 0
+SCHEDULER_DEBUG = True
+
+DUPEFILTER_DEBUG = True
+DUPEFILTER_CLASS = 'amazon_us_demo.dupefilters.DummyDupeFilter'
+
+# Proxy settings
+PROXY_POOL_ENABLED = True
+PROXY_POOL_FILTER_ANONYMOUS = True
+PROXY_POOL_FILTER_TYPES = 'https'
+PROXY_POOL_FILTER_CODE = 'us'
+PROXY_POOL_REFRESH_INTERVAL = 900
+PROXY_POOL_CLOSE_SPIDER = False
+PROXY_POOL_BAN_POLICY = 'amazon_us_demo.utils.AmazonBanDetectionPolicy'
+
 
 # CSV Exporter settings
 # FIELDS_TO_EXPORT = [
@@ -131,3 +174,5 @@ ELASTICSEARCH_BUFFER_LENGTH = int(os.getenv('ELASTICSEARCH_BUFFER_LENGTH', 500))
 FEED_EXPORTERS = {
     'csv': 'amazon_us_demo.exporters.CustomCsvItemExporter'
 }
+
+LOG_STDOUT = True

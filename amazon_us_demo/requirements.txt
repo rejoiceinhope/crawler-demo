@@ -1,4 +1,7 @@
 Scrapy
 scrapy-user-agents
-git+https://github.com/hyan15/python-deathbycaptcha.git
+deathbycaptcha
 elasticsearch
+scrapy-redis
+scrapy_proxy_pool
+python-dotenv

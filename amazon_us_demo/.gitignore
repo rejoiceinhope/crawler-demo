@@ -60,5 +60,6 @@ target/
 # RST readme version
 README
 
+.env
 *.txt
 !requirements.txt
