@@ -15,6 +15,23 @@ A demo illustrates crawl www.amazon.com detail page with scrapy. Currently suppo
 * book_description - book description
 * product_description - product description
 
+Offer listing fields are:
+* asin - Amazon ASIN
+* offers - JSON representation of all offers, offer fields include:
+    * price - Product price
+    * shipping_price - Shipping price
+    * condition - Condition
+    * subcondition - Subcondition
+    * condition_comments - Condition comments
+    * available - Whether product is currently available, or needs pre-ordered
+    * prime - Whether shipping supports prime options
+    * expected_shipping - Whether shipping support expected options
+    * seller_name - Seller name
+    * seller_rating - Seller rating
+    * seller_feedbacks - Seller feedback count
+    * seller_stars - Seller stars count
+    * offer_listing_id - Offer listing ID
+
 All line feed characters are replaced by '<pre><br /></pre>'.
 
 
@@ -38,7 +55,7 @@ Execution
 Before run this demo, the following environment variables should be defined:
 * AMAZON_CAPTCHA_RESOLVER_USERNAME - Your deathbycaptcha username
 * AMAZON_CAPTCHA_RESOLVER_PASSWORD - Your deathbycaptcha password
-* AMAZON_CAPTCHA_RESOLVER_THRESHOLD - Captcha resolve rate threshold, default is 32/s.
+* AMAZON_CAPTCHA_RESOLVER_THRESHOLD - Captcha resolve rate threshold, default is 32/min.
 * ELASTICSEARCH_SERVERS - Elasticsearch server, default is '127.0.0.1'.
 * ELASTICSEARCH_INDEX - Elasticsearch index.
 * ELASTICSEARCH_USERNAME - Elasticsearch username.
@@ -47,6 +64,10 @@ Before run this demo, the following environment variables should be defined:
 * ELASTICSEARCH_TIMEOUT - Elasticsearch timeout, default is 60.
 * ELASTICSEARCH_MAX_RETRY - Elasticsearch index max retry times, default is 3.
 * ELASTICSEARCH_BUFFER_LENGTH - Item count per index operation, default is 500.
+* REDIS_URL - Redis server url
+
+You can add a .env file in the same directory as this README.md file, it will be autoload.
+
 
 You can run this demo by:
 

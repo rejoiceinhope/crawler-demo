@@ -25,7 +25,7 @@ setup(
     license='New BSD License',
     author="Neal Wong",
     author_email='qwang16@olivetuniversity.edu',
-    url='https://github.com/hyan15/crawler-demo/tree/redis/amazon_us_demo',
+    url='https://github.com/hyan15/crawler-demo/tree/scrapy_redis/amazon_us_demo',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Framework :: Scrapy',
