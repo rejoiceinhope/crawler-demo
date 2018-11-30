@@ -44,7 +44,7 @@ CONCURRENT_REQUESTS_PER_IP = 3
 
 # Disable cookies (enabled by default)
 COOKIES_ENABLED = True
-COOKIES_DEBUG = True
+COOKIES_DEBUG = False
 
 # Disable Telnet Console (enabled by default)
 #TELNETCONSOLE_ENABLED = False
@@ -146,14 +146,14 @@ REDIS_START_URLS_KEY = '%(name)s:start_urls'
 REDIS_ENCODING = 'utf-8'
 
 SCHEDULER = 'scrapy_redis.scheduler.Scheduler'
-# SCHEDULER_SERIALIZER = 'scrapy_redis.picklecompat'
-SCHEDULER_SERIALIZER = 'json'
+SCHEDULER_SERIALIZER = 'scrapy_redis.picklecompat'
+# SCHEDULER_SERIALIZER = 'json'
 SCHEDULER_PERSIST = True
 SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.FifoQueue'
 SCHEDULER_IDLE_BEFORE_CLOSE = 0
-SCHEDULER_DEBUG = True
+SCHEDULER_DEBUG = False
 
-DUPEFILTER_DEBUG = True
+DUPEFILTER_DEBUG = False
 DUPEFILTER_CLASS = 'amazon_us_demo.dupefilters.DummyDupeFilter'
 
 # Proxy settings
@@ -175,4 +175,4 @@ FEED_EXPORTERS = {
     'csv': 'amazon_us_demo.exporters.CustomCsvItemExporter'
 }
 
-LOG_STDOUT = True
+LOG_STDOUT = False
