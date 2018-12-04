@@ -1,20 +1,20 @@
 [scrapyd]
-eggs_dir    = <%= @dirs[:eggs] %>
-logs_dir    = <%= @dirs[:logs] %>
-items_dir   = <%= @dirs[:items] %>
-jobs_to_keep = 5
-dbs_dir     = <%= @dirs[:dbs] %>
-max_proc    = 0
-max_proc_per_cpu = 4
-finished_to_keep = 100
-poll_interval = 5.0
+eggs_dir    = <%= node['scrapyd']['eggs_dir'] %>
+logs_dir    = <%= node['scrapyd']['logs_dir'] %>
+items_dir   = <%= node['scrapyd']['items_dir'] %>
+jobs_to_keep = <%= node['scrapyd']['jobs_to_keep'] %>
+dbs_dir     = <%= node['scrapyd']['dbs_dir'] %>
+max_proc    = <%= node['scrapyd']['max_proc'] %>
+max_proc_per_cpu = <%= node['scrapyd']['max_proc_per_cpu'] %>
+finished_to_keep = <%= node['scrapyd']['finished_to_keep'] %>
+poll_interval = <%= node['scrapyd']['poll_interval'] %>
 bind_address = <%= node['scrapyd']['bind_address'] %>
 http_port   = <%= node['scrapyd']['http_port'] %>
-debug       = off
-runner      = scrapyd.runner
-application = scrapyd.app.application
+debug       = <%= node['scrapyd']['debug'] %>
+runner      = <%= node['scrapyd']['runner'] %>
+application = <%= node['scrapyd']['application'] %>
 launcher    = scrapyd.launcher.Launcher
-webroot     = scrapyd.website.Root
+webroot     = <%= node['scrapyd']['webroot'] %>
 
 [services]
 schedule.json     = scrapyd.webservice.Schedule

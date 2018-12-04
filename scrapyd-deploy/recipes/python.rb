@@ -15,3 +15,6 @@ end
 execute 'pip install scrapyd' do
   user 'root'
 end
+execute "pip install #{node['scrapyd']['packages'].join(' ')}" do
+  user 'root'
+end

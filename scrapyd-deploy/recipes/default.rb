@@ -18,7 +18,10 @@ config_dir = '/etc/scrapyd'
 scrapyd_config = File.join(config_dir, 'scrapyd.conf')
 pidfile = File.join(run_dir, 'scrapyd.pid')
 
-[eggs_dir, dbs_dir, items_dir, logs_dir, run_dir].each do |writable_dir|
+[
+  node['scrapyd']['eggs_dir'], node['scrapyd']['dbs_dir'], node['scrapyd']['items_dir'],
+  node['scrapyd']['logs_dir'], run_dir
+].each do |writable_dir|
   directory writable_dir do
     owner node['scrapyd']['user']
     group node['scrapyd']['group']
@@ -35,7 +38,6 @@ end
 
 template scrapyd_config do
   source 'scrapyd.conf.erb'
-  variables({dirs: {eggs: eggs_dir, dbs: dbs_dir, items: items_dir, logs: logs_dir}})
   owner 'root'
   group 'root'
   mode '0644'
