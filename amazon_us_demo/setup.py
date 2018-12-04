@@ -35,6 +35,6 @@ setup(
         'Topic :: Internet :: WWW/HTTP',
     ],
     packages=find_packages(),
-    entry_points= {'scrapy': ['settings = %(settings)s']},
+    entry_points= {'scrapy': ['settings = amazon_us_demo.settings']},
     install_requires=read_requirements('requirements.txt')
 )

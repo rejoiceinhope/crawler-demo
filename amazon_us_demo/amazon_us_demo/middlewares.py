@@ -99,6 +99,7 @@ class AmazonUsCaptchaResolverMiddleware(object):
                 formdata={'field-keywords': captcha_text},
                 clickdata={'type': 'submit'})
             req.dont_filter = True
+            req.meta['proxy'] = None
 
             return req
 
