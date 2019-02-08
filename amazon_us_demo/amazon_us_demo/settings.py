@@ -121,6 +121,7 @@ PROXY_POOL_FILTER_TYPES = 'https'
 PROXY_POOL_FILTER_CODE = 'us'
 PROXY_POOL_REFRESH_INTERVAL = 900
 PROXY_POOL_CLOSE_SPIDER = False
+PROXY_POOL_FORCE_REFRESH = False
 PROXY_POOL_BAN_POLICY = 'amazon_us_demo.utils.AmazonBanDetectionPolicy'
 
 # CSV Exporter settings
