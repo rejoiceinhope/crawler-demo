@@ -11,7 +11,7 @@ class AmazonUsDemoPipeline(object):
         formatted_item = dict()
         formatted_item['asin'] = item['asin']
         formatted_item['title'] = item['title']
-        formatted_item['author'] = item['author']
+        formatted_item['author'] = ','.join(item['author'])
         feature_bullets = [f_bullet.strip().replace('\n', '<br />').replace('\t', ' ') for f_bullet in item['feature_bullets']]
         formatted_item['feature_bullets'] = '#FeatureBullets#'.join(feature_bullets)
         formatted_item['book_description'] = item['book_description'].replace('\n', '<br />').replace('\t', '')
@@ -38,7 +38,7 @@ class AmazonUsDemoPipeline(object):
                 continue
 
             pairs.append('{}:{}'.format(key.strip(), value.strip('(').strip().encode('utf-8')))
-        formatted_item['details'] = ';'.join(pairs)
+        formatted_item['details'] = '#Detail#'.join(pairs)
         formatted_item['star'] = item['star']
         formatted_item['reviews'] = item['reviews']
         formatted_item['rank'] = item['rank']
