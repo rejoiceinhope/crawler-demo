@@ -18,10 +18,12 @@ from deathbycaptcha.deathbycaptcha import HttpClient
 
 
 class AmazonUsCaptchaResolverMiddleware(object):
-    def __init__(self, username, password, threshold):
+    def __init__(self, username, password, threshold, wait_time, resolve_rate):
         self.username = username
         self.password = password
         self.threshold = threshold
+        self.wait_time = wait_time
+        self.resolve_rate = resolve_rate
 
         self.client = HttpClient(username, password)
         self.captcha_stats = {'count': 0, 'first_resolved': None, 'last_resolved': None}
@@ -35,10 +37,12 @@ class AmazonUsCaptchaResolverMiddleware(object):
         username = crawler.settings.get('AMAZON_CAPTCHA_RESOLVER_USERNAME')
         password = crawler.settings.get('AMAZON_CAPTCHA_RESOLVER_PASSWORD')
         threshold = crawler.settings.getint('AMAZON_CAPTCHA_RESOLVER_THRESHOLD', 5)
+        wait_time = crawler.settings.getint('AMAZON_CAPTCHA_WAIT_TIME', 3)
+        resolve_rate = crawler.settings.getint('AMAZON_CAPTCHA_RESOLVE_RATE', 4)
         if not username or not password:
             raise NotConfigured()
 
-        s = cls(username, password, threshold)
+        s = cls(username, password, threshold, wait_time, resolve_rate)
 
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
         return s
@@ -63,6 +67,9 @@ class AmazonUsCaptchaResolverMiddleware(object):
         # - return a Request object
         # - or raise IgnoreRequest
 
+        if request.meta.get('proxy', None) is not None:
+            return response
+
         captcha_input = response.xpath('//*[@id="captchacharacters"]').extract_first()
         if captcha_input is not None:
             spider.logger.info('Captcha find, try to resolve it!')
@@ -79,20 +86,21 @@ class AmazonUsCaptchaResolverMiddleware(object):
                 self.captcha_stats = {'count': 0, 'last_resolved': None, 'first_resolved': None}
                 raise CloseSpider('Too many captcha resolution found')
 
+            time.sleep(self.wait_time)
+
             captcha_url = response.xpath(
                 '//form//div[contains(@class, "a-text-center")]/img/@src').extract_first()
-            try:
-                r = self.client.upload(captcha_url)
-                if r and 'is_correct' in r and r['is_correct']:
-                    captcha_text = self.client.get_text(r['captcha'])
-                else:
-                    if r and 'captcha' in r:
-                        self.client.report(r['captcha'])
-
-                    captcha_text = ''.join(
-                        random.sample(string.ascii_lowercase + string.digits, 4))
-            except:
-                captcha_text = ''.join(random.sample(string.ascii_lowercase + string.digits, 4))
+            captcha_text = ''.join(random.sample(string.ascii_lowercase + string.digits, 4))
+            if self.captcha_stats['count'] % self.resolve_rate == 0:
+                try:
+                    r = self.client.upload(captcha_url)
+                    if r and 'is_correct' in r and r['is_correct']:
+                        captcha_text = self.client.get_text(r['captcha'])
+                    else:
+                        if r and 'captcha' in r:
+                            self.client.report(r['captcha'])
+                except:
+                    pass
 
             req = FormRequest.from_response(
                 response, formxpath='//form[@action="/errors/validateCaptcha"]',
