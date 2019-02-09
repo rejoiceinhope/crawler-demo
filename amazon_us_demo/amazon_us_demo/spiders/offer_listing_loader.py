@@ -7,7 +7,7 @@ import scrapy
 from scrapy_redis.spiders import RedisSpider
 from scrapy_redis.utils import bytes_to_str
 
-from amazon_us_demo.parsers import OfferListingParser
+from amazon_page_parser.parsers import OfferListingParser
 
 
 class OfferListingLoaderSpider(RedisSpider):
@@ -21,8 +21,13 @@ class OfferListingLoaderSpider(RedisSpider):
     }
 
     def parse(self, response):
+        offer_listings = {
+            'asin': self._extract_asin(response)
+        }
+
+        parser = OfferListingParser(response.text)
         try:
-            offer_listings = OfferListingParser.parse(response)
+            offer_listings['offers'] = parser.parse()
             yield offer_listings
         except Exception as e:
             self.logger.exception(e)
@@ -31,6 +36,10 @@ class OfferListingLoaderSpider(RedisSpider):
         asin = bytes_to_str(data, self.redis_encoding)
 
         return self._generate_offer_listing_url(asin)
+
+    def _extract_asin(self, response):
+        matched = re.match(r'.*www\.amazon\.com\/gp\/offer-listing\/([0-9A-Z]{10}).*', response.url)
+        return '' if matched is None or len(matched.groups()) <= 0 else matched.groups()[0]
 
     def _generate_offer_listing_url(self, asin):
         url = 'https://www.amazon.com/gp/offer-listing/{}'.format(asin)

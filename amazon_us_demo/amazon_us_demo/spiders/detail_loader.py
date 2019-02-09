@@ -7,7 +7,7 @@ import scrapy
 from scrapy_redis.spiders import RedisSpider
 from scrapy_redis.utils import bytes_to_str
 
-from amazon_us_demo.parsers import ProductDetailParser
+from amazon_page_parser.parsers import DetailParser
 
 
 class DetailLoaderSpider(RedisSpider):
@@ -24,11 +24,17 @@ class DetailLoaderSpider(RedisSpider):
     }
 
     def parse(self, response):
+        parser = DetailParser(response.text)
         try:
-            product = ProductDetailParser.parse(response)
-            yield product
+            info = parser.parse()
+            info['asin'] = self._extract_asin(response)
+            yield info
         except Exception as e:
             self.logger.exception(e)
+
+    def _extract_asin(self, response):
+        matched = re.match(r'.*www\.amazon\.com\/dp\/([0-9A-Z]{10}).*', response.url)
+        return '' if matched is None or len(matched.groups()) <= 0 else matched.groups()[0]
 
     def make_request_from_data(self, data):
         asin = bytes_to_str(data, self.redis_encoding)

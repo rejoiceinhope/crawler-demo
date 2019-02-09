@@ -6,11 +6,11 @@ A demo illustrates crawl www.amazon.com detail page with scrapy. Currently suppo
 * rank - Sales Rank in top browse node
 * star - Average star of custom reviews
 * reviews - Custom Reviews count
-* categories - Browse nodes tree
+* categories - Browse nodes trees
 * images - Multiple images are concated by ';'
 * author - Multiple authors are concated by ','
 * title - Title
-* details - Details are key, value pairs. Detail item is concated by ':' and items by ';'
+* details - Details are key, value pairs. Detail item is concated by ':' and items by '#Detail#'
 * feature_bullets - Feature bullets are concated by '#FeatureBullets#'
 * book_description - book description
 * product_description - product description

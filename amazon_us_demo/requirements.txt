@@ -1,7 +1,9 @@
 Scrapy
 scrapy-user-agents
 deathbycaptcha
+scrapy_proxy_pool
+amazon-page-parser
+six
 elasticsearch
 scrapy-redis
-scrapy_proxy_pool
 python-dotenv
