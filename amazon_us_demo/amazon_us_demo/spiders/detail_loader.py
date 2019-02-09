@@ -80,4 +80,7 @@ class DetailLoaderSpider(scrapy.Spider):
         referer = 'https://www.amazon.com/s/ref=nb_sb_noss_2?url=search-alias=aps&field-keywords='
         referer = referer + asin
 
-        return scrapy.Request(url, headers={'Referer': referer})
+        request = scrapy.Request(url, headers={'Referer': referer})
+        # request.meta['dont_redirect'] = True
+
+        return request

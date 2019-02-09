@@ -29,10 +29,10 @@ CONCURRENT_REQUESTS = 360
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 0.33
+DOWNLOAD_DELAY = 0.1
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
-CONCURRENT_REQUESTS_PER_IP = 3
+CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
 COOKIES_ENABLED = True
@@ -79,7 +79,7 @@ ITEM_PIPELINES = {
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
-AUTOTHROTTLE_ENABLED = True
+AUTOTHROTTLE_ENABLED = False
 # The initial download delay
 AUTOTHROTTLE_START_DELAY = 1
 # The maximum download delay to be set in case of high latencies
@@ -114,14 +114,18 @@ AMAZON_CAPTCHA_RESOLVER_ENABLED = True
 AMAZON_CAPTCHA_RESOLVER_USERNAME = os.getenv('AMAZON_CAPTCHA_RESOLVER_USERNAME', '')
 AMAZON_CAPTCHA_RESOLVER_PASSWORD = os.getenv('AMAZON_CAPTCHA_RESOLVER_PASSWORD', '')
 AMAZON_CAPTCHA_RESOLVER_THRESHOLD = os.getenv('AMAZON_CAPTCHA_RESOLVER_THRESHOLD', 32)
+AMAZON_CAPTCHA_WAIT_TIME = os.getenv('AMAZON_CAPTCHA_WAIT_TIME', 0)
+AMAZON_CAPTCHA_RESOLVE_RATE = os.getenv('AMAZON_CAPTCHA_RESOLVE_RATE', 1)
 
 PROXY_POOL_ENABLED = True
 PROXY_POOL_FILTER_ANONYMOUS = True
 PROXY_POOL_FILTER_TYPES = 'https'
 PROXY_POOL_FILTER_CODE = 'us'
-PROXY_POOL_REFRESH_INTERVAL = 900
+PROXY_POOL_REFRESH_INTERVAL = 600
 PROXY_POOL_CLOSE_SPIDER = False
-PROXY_POOL_FORCE_REFRESH = False
+PROXY_POOL_FORCE_REFRESH = True
+PROXY_POOL_TRY_WITH_HOST = True
+PROXY_POOL_PAGE_RETRY_TIMES = 3
 PROXY_POOL_BAN_POLICY = 'amazon_us_demo.utils.AmazonBanDetectionPolicy'
 
 # CSV Exporter settings

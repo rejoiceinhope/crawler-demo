@@ -16,6 +16,8 @@ def is_proxy_forbidden(response):
 
 
 class AmazonBanDetectionPolicy(BanDetectionPolicy):
+    NOT_BAN_STATUSES = [200, 404, 500, 503]
+
     def response_is_ban(self, request, response):
         base_ban = super(AmazonBanDetectionPolicy, self).response_is_ban(request, response)
         amazon_ban = is_robot_check(response)
