@@ -5,7 +5,7 @@ import re
 
 import scrapy
 
-from amazon_us_demo.parsers import OfferListingParser
+from amazon_page_parser.parsers import OfferListingParser
 
 
 class OfferListingLoaderSpider(scrapy.Spider):
@@ -39,11 +39,20 @@ class OfferListingLoaderSpider(scrapy.Spider):
                         yield self._generate_offer_listing_url(asin)
 
     def parse(self, response):
+        offer_listings = {
+            'asin': self._extract_asin(response)
+        }
+
+        parser = OfferListingParser(response.text)
         try:
-            offer_listings = OfferListingParser.parse(response)
+            offer_listings['offers'] = parser.parse()
             yield offer_listings
         except Exception as e:
             self.logger.exception(e)
+
+    def _extract_asin(self, response):
+        matched = re.match(r'.*www\.amazon\.com\/gp\/offer-listing\/([0-9A-Z]{10}).*', response.url)
+        return '' if matched is None or len(matched.groups()) <= 0 else matched.groups()[0]
 
     def _find_asin_files(self, asins_path):
         asin_files = []

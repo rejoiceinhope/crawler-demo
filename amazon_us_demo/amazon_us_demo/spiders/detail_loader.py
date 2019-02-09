@@ -6,7 +6,7 @@ import pdb
 
 import scrapy
 
-from amazon_us_demo.parsers import ProductDetailParser
+from amazon_page_parser.parsers import DetailParser
 
 
 class DetailLoaderSpider(scrapy.Spider):
@@ -44,12 +44,17 @@ class DetailLoaderSpider(scrapy.Spider):
                         yield self._generate_asin_url(asin)
 
     def parse(self, response):
+        parser = DetailParser(response.text)
         try:
-            product = ProductDetailParser.parse(response)
-            yield product
+            info = parser.parse()
+            info['asin'] = self._extract_asin(response)
+            yield info
         except Exception as e:
             self.logger.exception(e)
-            pdb.set_trace()
+
+    def _extract_asin(self, response):
+        matched = re.match(r'.*www\.amazon\.com\/dp\/([0-9A-Z]{10}).*', response.url)
+        return '' if matched is None or len(matched.groups()) <= 0 else matched.groups()[0]
 
     def _find_asin_files(self, asins_path):
         asin_files = []

@@ -25,7 +25,7 @@ def format_detail(item):
     formatted_item = dict()
     formatted_item['asin'] = item['asin']
     formatted_item['title'] = item['title']
-    formatted_item['author'] = item['author']
+    formatted_item['author'] = ','.join(item['author'])
     feature_bullets = [f_bullet.strip().replace('\n', '<br />').replace('\t', ' ') for f_bullet in item['feature_bullets']]
     formatted_item['feature_bullets'] = '#FeatureBullets#'.join(feature_bullets)
     formatted_item['book_description'] = item['book_description'].replace('\n', '<br />').replace('\t', '')
@@ -39,7 +39,8 @@ def format_detail(item):
             img_name = '.'.join([name_parts.pop(0), name_parts.pop()])
             parts.append(img_name)
             formatted_item['images'].append('/'.join(parts))
-        except:
+        except Exception as e:
+            spider.logger.exception(e)
             pass
     pairs = []
     for key, value in item['details'].items():
@@ -51,7 +52,7 @@ def format_detail(item):
             continue
 
         pairs.append('{}:{}'.format(key.strip(), value.strip('(').strip().encode('utf-8')))
-    formatted_item['details'] = ';'.join(pairs)
+    formatted_item['details'] = '#Detail#'.join(pairs)
     formatted_item['star'] = item['star']
     formatted_item['reviews'] = item['reviews']
     formatted_item['rank'] = item['rank']
