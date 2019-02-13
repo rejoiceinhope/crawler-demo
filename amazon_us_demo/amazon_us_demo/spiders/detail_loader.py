@@ -7,6 +7,7 @@ import pdb
 import scrapy
 
 from amazon_page_parser.parsers import DetailParser
+from amazon_us_demo.utils import MARKETPLACE_HOST_MAPPING
 
 
 class DetailLoaderSpider(scrapy.Spider):
@@ -27,6 +28,12 @@ class DetailLoaderSpider(scrapy.Spider):
                 '[InvalidArguments] You must supply "asins_path" argument to run detail_loader spider.')
             return
 
+        marketplace = getattr(self, 'marketplace', 'us').lower()
+        if marketplace not in MARKETPLACE_HOST_MAPPING:
+            self.logger.critical(
+                '[InvalidArguments] Marketplace %s is not supported', marketplace)
+            return
+
         asins_path = os.path.abspath(os.path.expanduser(asins_path))
         if not os.path.exists(asins_path):
             self.logger.critical('[InvalidArguments] Given "asins_path" does not exist!')
@@ -38,7 +45,7 @@ class DetailLoaderSpider(scrapy.Spider):
                 for line in asin_fh:
                     asin = line.strip()
                     if self._is_valid_asin(asin):
-                        yield self._generate_asin_url(asin)
+                        yield self._generate_asin_url(asin, marketplace)
 
     def parse(self, response):
         parser = DetailParser(response.text)
@@ -75,9 +82,10 @@ class DetailLoaderSpider(scrapy.Spider):
 
         return valid
 
-    def _generate_asin_url(self, asin):
-        url = 'https://www.amazon.com/dp/' + asin
-        referer = 'https://www.amazon.com/s/ref=nb_sb_noss_2?url=search-alias=aps&field-keywords='
+    def _generate_asin_url(self, asin, marketplace):
+        base = 'https://' + MARKETPLACE_HOST_MAPPING[marketplace]
+        url = base + '/dp/' + asin
+        referer = base + '/s/ref=nb_sb_noss_2?url=search-alias=aps&field-keywords='
         referer = referer + asin
 
         request = scrapy.Request(url, headers={'Referer': referer})

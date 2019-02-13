@@ -7,6 +7,21 @@
 from scrapy_proxy_pool.policy import BanDetectionPolicy
 from six.moves.urllib.parse import urlparse
 
+MARKETPLACE_HOST_MAPPING = {
+    'us': 'www.amazon.com',
+    'ca': 'www.amazon.ca',
+    'mx': 'www.amazon.com.mx',
+    'uk': 'www.amazon.co.uk',
+    'de': 'www.amazon.de',
+    'fr': 'www.amazon.fr',
+    'it': 'www.amazon.it',
+    'es': 'www.amazon.es',
+    'au': 'www.amazon.com.au',
+    'jp': 'www.amazon.jp',
+    'in': 'www.amazon.in',
+    'cn': 'www.amazon.cn'
+}
+
 def is_robot_check(response):
     return response.xpath('//*[@id="captchacharacters"]').extract_first() is not None
 
