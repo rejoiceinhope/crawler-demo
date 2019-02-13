@@ -15,7 +15,7 @@ class DetailLoaderSpider(scrapy.Spider):
     start_urls = ['https://www.amazon.com/']
     custom_settings = {
         'FIELDS_TO_EXPORT': [
-            'asin', 'rank', 'star', 'reviews', 'categories', 'images', 'author',
+            'asin', 'rank', 'star', 'reviews', 'categories', 'images', 'author', 'bylines',
            'title', 'details', 'feature_bullets', 'book_description', 'product_description'
         ]
     }
