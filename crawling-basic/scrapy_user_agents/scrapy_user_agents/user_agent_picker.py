@@ -10,7 +10,6 @@ import logging
 import user_agents
 
 logger = logging.getLogger(__name__)
-
 def group_by_device_type(uas_list):
     '''group user agent by device type, only "desktop", "mobile", "tablet" are supported'''
     ud = {
@@ -47,7 +46,7 @@ def group_by_device_type(uas_list):
         elif parsed_ua.is_pc:
             device_dict = ud['desktop']
         else:
-            logger.warn(
+            logger.warning(
                 '[UnsupportedDeviceType] Family: %s, Brand: %s, Model: %s',
                 parsed_ua.device.family, parsed_ua.device.brand, parsed_ua.device.model)
             continue
@@ -64,7 +63,7 @@ def group_by_device_type(uas_list):
         elif raw_browser_family.find('msie') != -1 or raw_browser_family.find('ie') != -1:
             browser_dict = device_dict['ie']
         else:
-            logger.warn(
+            logger.warning(
                 '[UnsupportedBrowserType] Family: %s', parsed_ua.browser.family)
             continue
 
